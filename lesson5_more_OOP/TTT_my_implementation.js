@@ -3,6 +3,23 @@ const assert = require('assert'); //must require the assert
 const readline = require('readline-sync');
 
 
+function joinOr(arr, separator = ', ', or = 'or') {
+  if (arr.length === 0) {
+    return "";
+  } else if (arr.length === 1) {
+    return arr[0].toString();
+  }
+  const start = arr.slice(0, -1).join(separator);
+  return start + separator + or + ' ' + arr[arr.length - 1];
+}
+// console.log(joinOr([1, 2, 3]));               // => "1, 2, or 3"
+// console.log(joinOr([1, 2, 3], '; '));         // => "1; 2; or 3"
+// console.log(joinOr([1, 2, 3], ', ', 'and'));  // => "1, 2, and 3"
+// console.log(joinOr([]));                      // => ""
+// console.log(joinOr([5]));                     // => "5"
+// console.log(joinOr([1, 2]));                  // => "1 or 2"
+
+
 class Square {
   static UNUSED_SQUARE = " ";
   static HUMAN_MARKER = "X";
@@ -128,6 +145,19 @@ class TTTGame {
     this.displayWelcomeMessage();
 
     while (true) {
+      this.playOnce();
+      if (!this.playAgain()) {
+        break;
+      }
+      console.clear();
+    }
+
+    this.displayGoodbyeMessage();
+  }
+
+  playOnce() {
+    this.board = new Board();
+    while (true) {
       this.board.display();
 
       this.humanMoves();
@@ -135,12 +165,23 @@ class TTTGame {
 
       this.computerMoves();
       if (this.gameOver()) break;
-      
+
       console.clear()
     }
-
     this.displayResults();
-    this.displayGoodbyeMessage();
+  }
+
+  playAgain() {
+    while (true) {
+      let ans = readline.question('Would you like to play again? (y)es or (n)o').toLowerCase();
+      if (['y', 'yes'].includes(ans)) {
+        return true
+      }
+      if (['n', 'no'].includes(ans)) {
+        return false
+      }
+      console.log('Invalid answer, please try again');
+    }
   }
 
   displayWelcomeMessage() {
@@ -168,7 +209,7 @@ class TTTGame {
 
     while (true) {
       let validChoices = this.board.unusedSquares();
-      choice = readline.question(`Choose a square (${validChoices.join(', ')}): `);
+      choice = readline.question(`Choose a square (${joinOr(validChoices, ', ')}): `);
 
       if (validChoices.includes(choice)) {
         break;
