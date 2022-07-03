@@ -149,9 +149,11 @@ class TTTGame {
 
   play() {
     this.displayWelcomeMessage();
+    let humanStarts = true;
 
     while (true) {
-      this.playOnce();
+      this.playOnce(humanStarts);
+      humanStarts = !humanStarts;
 
       if (this.human.nWins === TTTGame.MATCH_GOAL) {
         console.log(`Congratulations, you won the match!`);
@@ -170,18 +172,22 @@ class TTTGame {
     this.displayGoodbyeMessage();
   }
 
-  playOnce() {
+  playOnce(humanStarts) {
+    let humansMove = humanStarts;
     this.board = new Board();
+
     while (true) {
-      this.board.display();
 
-      this.humanMoves();
+      if (humansMove) {
+        this.board.display();
+        this.humanMoves();
+        console.clear()
+      } else {
+        this.computerMoves();        
+      }
+
+      humansMove = !humansMove
       if (this.gameOver()) break;
-
-      this.computerMoves();
-      if (this.gameOver()) break;
-
-      console.clear()
     }
     this.updateMatchTally();
     this.displayResults();
