@@ -108,6 +108,7 @@ class Board {
 class Player {
   constructor(marker) {
     this.marker = marker;
+    this.nWins = 0;
   }
 
   getMarker() {
@@ -138,6 +139,7 @@ class TTTGame {
     ["1", "5", "9"],            // diagonal: top-left to bottom-right
     ["3", "5", "7"],            // diagonal: bottom-left to top-right
   ];
+  static MATCH_GOAL = 3;
 
   constructor() {
     this.board = new Board();
@@ -150,6 +152,15 @@ class TTTGame {
 
     while (true) {
       this.playOnce();
+
+      if (this.human.nWins === TTTGame.MATCH_GOAL) {
+        console.log(`Congratulations, you won the match!`);
+        break;
+      }
+      if (this.computer.nWins === TTTGame.MATCH_GOAL) {
+        console.log(`Unfortunately, you lost the match!`);
+        break;
+      }
       if (!this.playAgain()) {
         break;
       }
@@ -172,6 +183,7 @@ class TTTGame {
 
       console.clear()
     }
+    this.updateMatchTally();
     this.displayResults();
   }
 
@@ -196,6 +208,14 @@ class TTTGame {
     console.log("Thanks for playing Tic Tac Toe! Goodbye!");
   }
 
+  updateMatchTally() {
+    if (this.isWinner(this.human)) {
+      this.human.nWins += 1;
+    } else if (this.isWinner(this.computer)) {
+      this.computer.nWins += 1;
+    }
+  }
+
   displayResults() {
     console.clear()
     this.board.display();
@@ -206,6 +226,7 @@ class TTTGame {
     } else {
       console.log("A tie game. How boring.");
     }
+    console.log(`The match tally is currently human:${this.human.nWins} to computer:${this.computer.nWins}`);
   }
 
   humanMoves() {
