@@ -58,6 +58,7 @@ class Board {
   }
 
   markSquareAt(key, marker) {
+    console.log(`key: ${key}`);    
     this.squares[key].setMarker(marker);
   }
 
@@ -92,12 +93,15 @@ class Board {
     return this.unusedSquares().length === 0;
   }
 
-  countMarkersFor(player, keys) {
+  getMarkersIn(marker, keys) {
     let markers = keys.filter(key => {
-      return this.squares[key].getMarker() === player.getMarker();
+      return this.squares[key].getMarker() === marker;
     });
-
-    return markers.length;
+    return markers
+  }
+  
+  countMarkersIn(marker, keys) {
+    return this.getMarkersIn(marker, keys).length;
   }
 }
 
@@ -173,7 +177,7 @@ class TTTGame {
 
   playAgain() {
     while (true) {
-      let ans = readline.question('Would you like to play again? (y)es or (n)o').toLowerCase();
+      let ans = readline.question('Would you like to play again? (y)es or (n)o: ').toLowerCase();
       if (['y', 'yes'].includes(ans)) {
         return true
       }
@@ -223,14 +227,54 @@ class TTTGame {
   }
   
   computerMoves() {
+    this.board.markSquareAt(this.computerGetChoice(), this.computer.getMarker());
+  }
+
+  computerGetChoice() {
     let validChoices = this.board.unusedSquares();
     let choice;
 
+    choice = this.computerGetOffensiveChoice();
+    if (choice) {
+      return choice;
+    }
+
+    choice = this.computerGetDefensiveChoice();
+    if (choice) {
+      return choice;
+    }
+
+    if (validChoices.includes('5')) {
+      return '5';
+    }
+
+    // Return a random move otherwise
     do {
       choice = Math.floor((9 * Math.random()) + 1).toString();
     } while (!validChoices.includes(choice));
+    return choice
+  }
 
-    this.board.markSquareAt(choice, this.computer.getMarker());
+  computerGetOffensiveChoice() {
+    return this.getStrategicChoice(this.computer.getMarker());
+  }
+
+  computerGetDefensiveChoice() {
+    return this.getStrategicChoice(this.human.getMarker());
+  }
+
+  /**
+   * Looks at all possible rows.  If a row contains two markers equal to `marker` and one empty square, the key of the empty square is returned.
+   * @param {string} marker character
+   * @returns null | string - If non-null returns the key (i.e. '3') of the strategic choice
+   */
+  getStrategicChoice(marker) {
+    for (const row of TTTGame.POSSIBLE_WINNING_ROWS) {
+      if (this.board.countMarkersIn(marker, row) === 2 && this.board.countMarkersIn(Square.UNUSED_SQUARE, row) === 1) {
+        return this.board.getMarkersIn(Square.UNUSED_SQUARE, row)[0];
+      }
+    }
+    return null;
   }
 
   gameOver() {
@@ -243,7 +287,7 @@ class TTTGame {
 
   isWinner(player) {
     return TTTGame.POSSIBLE_WINNING_ROWS.some(row => {
-      return this.board.countMarkersFor(player, row) === 3;
+      return this.board.countMarkersIn(player.getMarker(), row) === 3;
     });
   }
 }
