@@ -186,3 +186,172 @@ class Truck extends Vehicle {
     return 6;
   }
 }
+
+
+console.log(`\n ----------------------- Shouter ----------------------- `);
+// function Person() {
+// }
+// Person.prototype.greeting = function (text) {
+//   console.log(text);
+// }
+
+// function Shouter() {
+//   Person.call(this);
+// }
+// Shouter.prototype = Object.create(Person.prototype)
+// Shouter.prototype.greeting = function (text) {
+//   Person.prototype.greeting.call(this, text.toUpperCase());
+// }
+
+// let person = new Person();
+// let shouter = new Shouter();
+
+// person.greeting("Hello. It's very nice to meet you."); // Hello. It's very nice to meet you
+// shouter.greeting("Hello my friend."); // HELLO MY FRIEND.
+
+// class Person {
+//   greeting(text) {
+//     console.log(text);
+//   }
+// }
+
+// class Shouter extends Person {
+//   greeting(text) {
+//     super.greeting(text.toUpperCase());
+//   }
+// }
+
+// let person = new Person();
+// let shouter = new Shouter();
+
+// person.greeting("Hello. It's very nice to meet you."); // Hello. It's very nice to meet you
+// shouter.greeting("Hello my friend."); // HELLO MY FRIEND.
+
+
+console.log(`\n ----------------------- Moving ----------------------- `);
+const walkMixin = {
+  walk() {
+    return `${this.name} ${this.gait()} forward`
+  }
+}
+
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+
+  gait() {
+    return "strolls";
+  }
+}
+Object.assign(Person.prototype, walkMixin);
+
+class Cat {
+  constructor(name) {
+    this.name = name;
+  }
+
+  gait() {
+    return "saunters";
+  }
+}
+Object.assign(Cat.prototype, walkMixin);
+
+class Cheetah {
+  constructor(name) {
+    this.name = name;
+  }
+
+  gait() {
+    return "runs";
+  }
+}
+Object.assign(Cheetah.prototype, walkMixin);
+
+let mike = new Person("Mike");
+console.log(mike.walk());
+// "Mike strolls forward"
+
+let kitty = new Cat("Kitty");
+console.log(kitty.walk());
+// "Kitty saunters forward"
+
+let flash = new Cheetah("Flash");
+console.log(flash.walk());
+// "Flash runs forward"
+
+
+console.log(`\n ----------------------- Pet Shelter ----------------------- `);
+class Pet {
+  constructor(type, name) {
+    this.type = type;
+    this.name = name;
+  }
+
+  toString() {
+    return `a ${this.type} named ${this.name}`
+  }
+}
+
+class Owner {
+  constructor(name) {
+    this.name = name;
+    this.pets = [];
+  }
+
+  addPet(pet) {
+    this.pets.push(pet);
+  }
+
+  toString() {
+    let str = `${this.name} has adopted the following pets:\n`;
+    str += this.pets.map(pet => pet.toString()).join('\n');
+    console.log(`str: ${str}`);
+    return str
+  }
+
+  numberOfPets() {
+    return this.pets.length;
+  }
+}
+
+class Shelter {
+  constructor() {
+    this.owners = {};
+  }
+
+  adopt(owner, pet) {
+    this.owners[owner.name] = owner;
+    owner.addPet(pet);
+  }
+
+  printAdoptions() {
+    for (const owner of Object.values(this.owners)) {
+      console.log(`${owner}`);
+      console.log('');
+    }
+  }
+}
+
+let butterscotch = new Pet('cat', 'Butterscotch');
+let pudding = new Pet('cat', 'Pudding');
+let darwin = new Pet('bearded dragon', 'Darwin');
+let kennedy = new Pet('dog', 'Kennedy');
+let sweetie = new Pet('parakeet', 'Sweetie Pie');
+let molly = new Pet('dog', 'Molly');
+let chester = new Pet('fish', 'Chester');
+
+let phanson = new Owner('P Hanson');
+let bholmes = new Owner('B Holmes');
+
+let shelter = new Shelter();
+shelter.adopt(phanson, butterscotch);
+shelter.adopt(phanson, pudding);
+shelter.adopt(phanson, darwin);
+shelter.adopt(bholmes, kennedy);
+shelter.adopt(bholmes, sweetie);
+shelter.adopt(bholmes, molly);
+shelter.adopt(bholmes, chester);
+shelter.printAdoptions();
+console.log(`${phanson.name} has ${phanson.numberOfPets()} adopted pets.`);
+console.log(`${bholmes.name} has ${bholmes.numberOfPets()} adopted pets.`);
